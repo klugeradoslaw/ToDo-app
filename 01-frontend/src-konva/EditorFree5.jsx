@@ -8,7 +8,6 @@ function EditorFree5() {
     const width = window.innerWidth - 100;
 
     const [lines, setLines] = useState([]);
-
     const [isDrawing, setIsDrawing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [startPoint, setStartPoint] = useState(null);
@@ -16,7 +15,7 @@ function EditorFree5() {
 
     function findLineIndex(pointerPos) {
         for (let i = 0; i < lines.length; i++) {
-            const line = line[i];
+            const line = lines[i];
             const [x1, y1, x2, y2] = line.points;
             const distance = Math.abs(
                 (y2 - y1) * pointerPos.x - (x2 - x1) * pointerPos.y + x2 * y1 - y2 * x1
@@ -35,33 +34,39 @@ function EditorFree5() {
     };
 
     const handleMouseDown = (event) => {
-        let pointerPos = event.target.getStage().getPointerPosition();
-        const clickedOnLine = event.target.findAncestors('Line').length > 0;
-
-        console.log("0: " + isDragging)
-        if (isDragging && clickedOnLine) {
-            setIsDrawing(false);
-            console.log("1: " + isDragging)
-            const lineIndex = findLineIndex(pointerPos)
-            setSelectedLineIndex(lineIndex)
-        } else {
-            pointerPos = getPosition(event.target.getStage().getPointerPosition());
-            setStartPoint({x: pointerPos.x, y: pointerPos.y});
-            setIsDrawing(true);
-            console.log("2: " + isDragging)
-
+        const pointerPos = event.target.getStage().getPointerPosition();
+        const lineIndex = findLineIndex(pointerPos);
+        setSelectedLineIndex(lineIndex);
+        if (selectedLineIndex !== null) {
+            setIsDragging(true);
+            setIsDrawing(false)
+            console.log("0: is Drawing " + isDrawing + "... isDragging: " + isDragging)
+            console.log("id: " + selectedLineIndex)
         }
-    };
+        if (selectedLineIndex === null) {
+            setIsDragging(false)
+            setIsDrawing(true)
+            const startPos = getPosition(event.target.getStage().getPointerPosition());
+            setStartPoint({x: startPos.x, y: startPos.y});
+            console.log("1: is Drawing " + isDrawing + "... isDragging: " + isDragging)
+        }
+    }
 
     const handleMouseMove = (event) => {
-            if (isDrawing === true && !isDragging) {
-                const pointerPos = getPosition(event.target.getStage().getPointerPosition());
-                setLines((prevLines) => {
-                    const updatedLines = [...prevLines];
-                    updatedLines.pop();
-                    return [...updatedLines, {points: [startPoint.x, startPoint.y, pointerPos.x, pointerPos.y]}];
-                });
-                console.log("3: " + isDragging)
+        if (selectedLineIndex !== null) {
+            setIsDragging(true);
+            setIsDrawing(false)
+            console.log("2: is Drawing " + isDrawing + "... isDragging: " + isDragging)
+        }
+        if (selectedLineIndex === null) {
+            setIsDragging(false)
+            setIsDrawing(true)
+            const pointerPos = getPosition(event.target.getStage().getPointerPosition());
+            setLines((prevLines) => {
+                const updatedLines = [...prevLines];
+                updatedLines.pop();
+                return [...updatedLines, {points: [startPoint.x, startPoint.y, pointerPos.x, pointerPos.y]}];
+            })
         }
     };
 
