@@ -54,3 +54,34 @@ export default function Editor2() {
         </Stage>
     );
 };
+
+const handleMouseDown = (event) => {
+    const clickedOnLine = event.target.findAncestors('Line').length > 0;
+
+    if (!isDrawing && !clickedOnLine) {
+        const pointerPos = getPosition(event.target.getStage().getPointerPosition());
+        setStartPoint({x: pointerPos.x, y: pointerPos.y});
+        setIsDrawing(true);
+    }
+};
+
+const handleMouseMove = (event) => {
+    if (isDrawing === true) {
+        const pointerPos = getPosition(event.target.getStage().getPointerPosition());
+        setLines((prevLines) => {
+            const updatedLines = [...prevLines];
+            updatedLines.pop();
+            return [...updatedLines, {points: [startPoint.x, startPoint.y, pointerPos.x, pointerPos.y]}];
+        });
+    }
+};
+
+const handleMouseUp = (event) => {
+    if (isDrawing) {
+        const pointerPos = getPosition(event.target.getStage().getPointerPosition());
+        const newLine = {points: [startPoint.x, startPoint.y, pointerPos.x, pointerPos.y]};
+        setLines((prevLines) => [...prevLines, newLine]);
+        setStartPoint(null);
+        setIsDrawing(false);
+    }
+};
