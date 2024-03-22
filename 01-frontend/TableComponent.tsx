@@ -8,8 +8,10 @@ import TableRow from "@mui/material/TableRow";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { IconButton, Stack, Typography } from "@mui/material";
 import { InvoiceStatus, InvoiceStatusType } from "../../const/InvoiceStatus";
+import {ReactNode} from "react";
+import {Circle} from "@mui/icons-material";
 
-type Props<T> = {
+interface Props<T> {
   columns: Array<{ accessorKey: keyof T; header: string }>;
   data: T[];
 };
@@ -19,8 +21,8 @@ function TableComponent<T>({ data, columns }: Props<T>) {
     return InvoiceStatus.find(
       (status: InvoiceStatusType) => status.title === invoiceStatus)?.fillColor;
   };
-  
-    return (
+
+  return (
     <TableContainer>
       <Table
         sx={{ minWidth: 650, fontFamily: "Roboto" }}
@@ -41,7 +43,16 @@ function TableComponent<T>({ data, columns }: Props<T>) {
             <TableRow key={rowId}>
               {columns.map((column) => (
                 <TableCell key={column.accessorKey.toString()}>
-                  {row[column.accessorKey]}
+                  <Stack
+                      direction="row"
+                      spacing={1}
+                      justifyContent="flex-start"
+                      alignItems="center"
+                  >
+                    {column.accessorKey === 'invoiceStatus' &&
+                        <Circle fill={setCircleColor(row.invoiceStatus)}/>}
+                  {row[column.accessorKey] as ReactNode}
+                  </Stack>
                 </TableCell>
               ))}
 
